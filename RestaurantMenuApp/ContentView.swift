@@ -10,8 +10,21 @@ import SwiftUI
 struct ContentView: View {
     
     var body: some View {
-        Text("Hello, world!")
-            .padding()
+        VStack {
+            Text("Hello, world!")
+        }
+        .padding()
+        .onAppear {
+            let repository = RestaurantRepository(configuration: .default)
+            
+            repository.fetchRestaurants(state: "NY", page: 1, completion: {
+                print($0)
+            })
+            
+            repository.fetchMenuItems(restaurantId: 4310410377884499, completion: {
+                print($0)
+            })
+        }
     }
 }
 
