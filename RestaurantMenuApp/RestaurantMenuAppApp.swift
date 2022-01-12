@@ -11,9 +11,8 @@ import SwiftUI
 struct RestaurantMenuAppApp: App {
     var body: some Scene {
         WindowGroup {
-//            ContentView()
-//            RestaurantsListConfigurator.configure()
-            RestaurantMenuConfigurator.configure()
+            RestaurantsListConfigurator.configure()
+//            RestaurantMenuConfigurator.configure()
         }
     }
 }
