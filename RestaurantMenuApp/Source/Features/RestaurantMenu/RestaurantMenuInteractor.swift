@@ -7,9 +7,13 @@
 
 class RestaurantMenuInteractor {
     
-    private let repository: RestaurantProvider
+    let model: RestaurantMenuModel
     
-    init(repository: RestaurantProvider) {
-        self.repository = repository
+    init(model: RestaurantMenuModel) {
+        self.model = model
+    }
+    
+    func fetchMenuItems(restaurantId: Int) {
+        model.fetchMenuItems(restaurantId: restaurantId)
     }
 }

@@ -6,7 +6,13 @@
 //
 
 import XCTest
+import ViewInspector
+
 @testable import RestaurantMenuApp
+
+extension RestaurantsListView: Inspectable {}
+
+extension RestaurantItemView: Inspectable {}
 
 class RestaurantMenuAppTests: XCTestCase {
 
@@ -18,9 +24,34 @@ class RestaurantMenuAppTests: XCTestCase {
         // Put teardown code here. This method is called after the invocation of each test method in the class.
     }
 
-    func testExample() throws {
-        // This is an example of a functional test case.
-        // Use XCTAssert and related functions to verify your tests produce the correct results.
+    func test_listItems() throws {
+//        let sut = RestaurantsListConfigurator.configure(provider: MockRestaurantRepository())
+//
+//        let navigation = try sut.inspect().navigationView()
+//        let scrollView = try navigation.scrollView(0)
+//        let lazyVStack = try scrollView.lazyVStack()
+//        let forEach = try lazyVStack.forEach(0)
+        
+        // TODO: Test forEach
+    }
+    
+    func test_navigationTitle() throws {
+        let sut = RestaurantsListConfigurator.configure(provider: MockRestaurantRepository())
+        
+        let title = try sut.inspect().navigationView().find(text: "Restaurants in NY").string()
+        
+        XCTAssertFalse(title.isEmpty)
+    }
+    
+    func test_restaurantItemView() throws {
+        let sut = RestaurantItemView(title: "title", subtitle: "subtitle")
+        
+        let vStack = try sut.inspect().vStack()
+        let title = try vStack.text(0).string()
+        let subtitle = try vStack.text(1).string()
+        
+        XCTAssert(title == "title")
+        XCTAssert(subtitle == "subtitle")
     }
 
     func testPerformanceExample() throws {

@@ -9,7 +9,7 @@ struct Response<T: Codable>: Codable {
     let totalResults: Int
     let totalPages: Int
     let morePages: Bool
-    let data: [T]
+    let data: T
 
     enum CodingKeys: String, CodingKey {
         case totalResults

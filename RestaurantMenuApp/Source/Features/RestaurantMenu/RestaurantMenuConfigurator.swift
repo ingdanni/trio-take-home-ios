@@ -7,11 +7,20 @@
 
 class RestaurantMenuConfigurator {
     
-    static func configure() -> RestaurantMenuView {
+    static func configure(restaurant: Restaurant) -> RestaurantMenuView {
         RestaurantMenuView(
             presenter: RestaurantMenuPresenter(
+                restaurant: restaurant,
                 interactor: RestaurantMenuInteractor(
-                    repository: RestaurantRepository(
-                        configuration: .default))))
+                    model: RestaurantMenuModel(repository: RestaurantRepository(
+                        configuration: .default)))))
+    }
+    
+    static func configure(restaurant: Restaurant, provider: RestaurantProvider) -> RestaurantMenuView {
+        RestaurantMenuView(
+            presenter: RestaurantMenuPresenter(
+                restaurant: restaurant,
+                interactor: RestaurantMenuInteractor(
+                    model: RestaurantMenuModel(repository: provider))))
     }
 }

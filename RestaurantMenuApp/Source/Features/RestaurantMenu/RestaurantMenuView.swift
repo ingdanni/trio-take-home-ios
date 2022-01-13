@@ -14,22 +14,23 @@ struct RestaurantMenuView: View {
     var body: some View {
         VStack {
             RestaurantHeader(
-                title: "Monta lisa pasta",
+                title: presenter.restaurant.restaurantName,
                 subtitle: "MENU")
-            
+
             MenuCategorySelector(
-                tabs: ["Salads", "Small plates", "Dishes", "Hamburgues", "Pizzas", "Wings"],
-                selected: "Salads")
+                tabs: presenter.categories,
+                selected: $presenter.selectedCategory) // TODO: Handle selected
             
-            MenuItemView(
-                name: "Pear salad",
-                description: "Reid’s Orchard Pears / Bitter Greens / Granola / Firefly Farms Black and Blue / Pine Nut Vinaigrette",
-                price: "$ 11.50")
-            
-            MenuItemView(
-                name: "Pear salad",
-                description: "Reid’s Orchard Pears / Bitter Greens / Granola / Firefly Farms Black and Blue / Pine Nut Vinaigrette",
-                price: "$ 11.50")
+            ScrollView {
+                LazyVStack {
+                    ForEach(presenter.list, id: \.itemID) { item in
+                        MenuItemView(
+                            name: item.menuItemName,
+                            description: item.menuItemDescription,
+                            price: item.menuItemPricing.first?.priceString ?? "")
+                    }
+                }
+            }
             
             Spacer()
         }
@@ -93,7 +94,7 @@ struct MenuCategorySelector: View {
     
     var tabs: [String]
     
-    @State var selected: String
+    @Binding var selected: String
     
     var body: some View {
         VStack(spacing: 0) {
@@ -111,15 +112,15 @@ struct MenuCategorySelector: View {
                             .frame(height: 30)
                             .font(Font.montserratRegular(size: 12))
                             .foregroundColor(
-                                selected == item
+                                selected.lowercased() == item.lowercased()
                                 ? Color.customBlack
                                 : Color.customLightGray2
                             )
-                            .padding(.horizontal, 8)
+                            .padding(.horizontal, 16)
                             
                             Rectangle()
                                 .fill(
-                                    selected == item
+                                    selected.lowercased() == item.lowercased()
                                     ? Color.customBlack
                                     : Color.customLightGray2
                                 )
@@ -143,7 +144,7 @@ struct RestaurantMenuView_Previews: PreviewProvider {
             
             MenuCategorySelector(
                 tabs: ["Salads", "Small plates", "Dishes", "Hamburguers", "Pizzas", "Wings"],
-                selected: "Salads")
+                selected: .constant("Salads"))
             
             MenuItemView(
                 name: "Pear salad",

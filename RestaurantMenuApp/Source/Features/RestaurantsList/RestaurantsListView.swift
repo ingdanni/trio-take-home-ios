@@ -14,8 +14,15 @@ struct RestaurantsListView: View {
     var body: some View {
         NavigationView {
             ScrollView {
-                ForEach(0..<10) { _ in
-                    RestaurantItemView(title: "Monalisa pasta & pizza", subtitle: "Italian, pizza, pasta")
+                LazyVStack {
+                    ForEach(presenter.list, id: \.restaurantID) { item in
+                        
+                        self.presenter.restaurantLinkBuilder(for: item, content: {
+                            RestaurantItemView(
+                                title: item.restaurantName,
+                                subtitle: item.cuisinesString)
+                        })
+                    }
                 }
             }
             .navigationBarTitleDisplayMode(.large)

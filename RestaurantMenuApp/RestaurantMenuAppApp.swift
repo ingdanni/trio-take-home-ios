@@ -9,9 +9,13 @@ import SwiftUI
 
 @main
 struct RestaurantMenuAppApp: App {
+    
     var body: some Scene {
         WindowGroup {
-            RestaurantsListConfigurator.configure()
+//            RestaurantMenuConfigurator.configure(restaurant: MockData.makeRestaurant(), provider: MockRestaurantRepository())
+            RestaurantsListConfigurator.configure(provider: MockRestaurantRepository())
+            
+//            RestaurantsListConfigurator.configure()
 //            RestaurantMenuConfigurator.configure()
         }
     }

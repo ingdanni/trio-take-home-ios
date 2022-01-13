@@ -1,13 +1,13 @@
 //
-//  RestaurantMenuAppUITestsLaunchTests.swift
-//  RestaurantMenuAppUITests
+//  RestaurantUITestsLaunchTests.swift
+//  RestaurantUITests
 //
 //  Created by Danny Narvaez on 12/1/22.
 //
 
 import XCTest
 
-class RestaurantMenuAppUITestsLaunchTests: XCTestCase {
+class RestaurantUITestsLaunchTests: XCTestCase {
 
     override class var runsForEachTargetApplicationUIConfiguration: Bool {
         true

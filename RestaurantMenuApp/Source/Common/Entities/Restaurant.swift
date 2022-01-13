@@ -15,6 +15,10 @@ struct Restaurant: Codable {
     let restaurantID: Int
     let cuisines: [String]
     let lastUpdated: String
+    
+    var cuisinesString: String {
+        cuisines.joined(separator: ", ")
+    }
 
     enum CodingKeys: String, CodingKey {
         case restaurantName = "restaurant_name"

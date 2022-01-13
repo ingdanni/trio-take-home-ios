@@ -9,4 +9,8 @@ import SwiftUI
 
 class RestaurantsListRouter {
     
+    func makeDetailView(for restaurant: Restaurant) -> some View {
+        // TODO: Change provider
+        RestaurantMenuConfigurator.configure(restaurant: restaurant, provider: MockRestaurantRepository())
+    }
 }
