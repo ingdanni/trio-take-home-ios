@@ -34,6 +34,9 @@ struct RestaurantMenuView: View {
             
             Spacer()
         }
+        .onAppear {
+            presenter.load()
+        }
     }
 }
 

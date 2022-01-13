@@ -31,7 +31,6 @@ class RestaurantsListPresenter: ObservableObject {
         
         // TODO: Handle pagination
         
-        // Load initial data
         interactor.fetchRestaurants(state: selectedState, page: currentPage)
     }
     

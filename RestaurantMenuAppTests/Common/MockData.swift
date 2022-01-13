@@ -5,6 +5,8 @@
 //  Created by Danny Narvaez on 12/1/22.
 //
 
+@testable import RestaurantMenuApp
+
 struct MockData {
 
     static func makeRestaurants() -> Response<[Restaurant]> {
@@ -74,16 +76,5 @@ struct MockData {
                  restaurantPhone: "",
                  subsection: category,
                  subsectionDescription: category)
-    }
-}
-
-class MockRestaurantRepository: RestaurantProvider {
-    
-    func fetchMenuItems(restaurantId: Int, completion: @escaping (Result<Response<[MenuItem]>, HTTPClientError>) -> Void) {
-        completion(.success(MockData.makeMenuItems(restaurantID: restaurantId)))
-    }
-    
-    func fetchRestaurants(state: String, page: Int, completion: @escaping (Result<Response<[Restaurant]>, HTTPClientError>) -> Void) {
-        completion(.success(MockData.makeRestaurants()))
     }
 }
