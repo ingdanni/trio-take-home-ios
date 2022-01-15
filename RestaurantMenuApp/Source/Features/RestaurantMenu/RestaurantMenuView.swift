@@ -19,15 +19,19 @@ struct RestaurantMenuView: View {
 
             MenuCategorySelector(
                 tabs: presenter.categories,
-                selected: $presenter.selectedCategory) // TODO: Handle selected
+                selected: $presenter.selectedCategory)
             
             ScrollView {
                 LazyVStack {
-                    ForEach(presenter.list, id: \.itemID) { item in
-                        MenuItemView(
-                            name: item.menuItemName,
-                            description: item.menuItemDescription,
-                            price: item.menuItemPricing.first?.priceString ?? "")
+                    switch presenter.state {
+                    case .loading:
+                        ProgressView("Loading menu")
+                    case .loaded:
+                        menuItemsList
+                    case .empty:
+                        MessageView(content: "Sorry, we didn't find menu items")
+                    case .error:
+                        MessageView(content: "An error ocurred, try again later.")
                     }
                 }
             }
@@ -36,6 +40,15 @@ struct RestaurantMenuView: View {
         }
         .onAppear {
             presenter.load()
+        }
+    }
+    
+    var menuItemsList: some View {
+        ForEach(presenter.list, id: \.itemID) { item in
+            MenuItemView(
+                name: item.menuItemName,
+                description: item.menuItemDescription,
+                price: item.price)
         }
     }
 }
@@ -74,6 +87,7 @@ struct MenuItemView: View {
             
             Text(name)
                 .font(Font.playfairDisplayRegular(size: 24))
+                .multilineTextAlignment(.center)
                 .padding(.bottom, 10)
             
             Text(description)
@@ -90,6 +104,7 @@ struct MenuItemView: View {
                 .frame(height: 0.5)
                 .padding(.horizontal, 44)
         }
+        .padding(.horizontal, 16)
     }
 }
 

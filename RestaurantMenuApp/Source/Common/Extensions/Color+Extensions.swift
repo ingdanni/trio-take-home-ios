@@ -33,6 +33,7 @@ struct ColorExtensions_Previews: PreviewProvider {
         VStack {
             Rectangle()
                 .fill(Color.customBlack)
+            
             Rectangle()
                 .fill(Color.customGray)
             

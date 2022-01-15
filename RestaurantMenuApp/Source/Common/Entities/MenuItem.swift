@@ -18,6 +18,10 @@ struct MenuItem: Codable {
     let restaurantPhone: String
     let subsection: String
     let subsectionDescription: String
+    
+    var price: String {
+        menuItemPricing.first?.priceString ?? "$0.0"
+    }
 
     enum CodingKeys: String, CodingKey {
         case itemID = "item_id"

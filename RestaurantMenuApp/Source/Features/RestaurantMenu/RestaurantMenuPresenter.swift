@@ -15,10 +15,12 @@ class RestaurantMenuPresenter: ObservableObject {
     
     private var cancellables = Set<AnyCancellable>()
     
-    @Published var restaurant: Restaurant
+    var restaurant: Restaurant
+    
     @Published var categories: [String] = []
     @Published var selectedCategory: String = ""
     @Published var list: [MenuItem] = []
+    @Published var state: RestaurantMenuState = .loading
     
     init(restaurant: Restaurant, interactor: RestaurantMenuInteractor) {
         self.restaurant = restaurant
@@ -28,12 +30,20 @@ class RestaurantMenuPresenter: ObservableObject {
             .receive(on: DispatchQueue.main)
             .sink(receiveValue: { items in
                 self.categories = items
-                self.selectedCategory = items.first ?? ""
+                
+                if let selectedCategory = items.first {
+                    self.selectedCategory = selectedCategory
+                }
                 
                 self.list = interactor.model.list.filter {
                     $0.subsection == self.selectedCategory
                 }
             })
+            .store(in: &cancellables)
+        
+        interactor.model.$state
+            .receive(on: DispatchQueue.main)
+            .assign(to: \.state, on: self)
             .store(in: &cancellables)
         
         $selectedCategory

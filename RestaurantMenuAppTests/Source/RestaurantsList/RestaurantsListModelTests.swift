@@ -16,11 +16,11 @@ class RestaurantsListModelTests: XCTestCase {
 
     override func setUpWithError() throws {
         repository = MockRestaurantRepository()
-        
         model = RestaurantsListModel(repository: repository)
     }
 
     override func tearDownWithError() throws {
+        repository = nil
         model = nil
     }
     
@@ -37,12 +37,13 @@ class RestaurantsListModelTests: XCTestCase {
         
         XCTAssertFalse(model.list.isEmpty)
         XCTAssert(model.list.count == 22)
+        XCTAssert(model.state == .loaded)
         
         wait(for: [expectation], timeout: 0.5)
     }
     
-    func test_fetchRestaurantsFailed() throws {
-        repository.kindOfTest = .failure
+    func test_fetchRestaurantsEmpty() throws {
+        repository.kindOfResponse = .empty
         
         let expectation = XCTestExpectation(description: "fetch restaurants from model")
         
@@ -53,6 +54,24 @@ class RestaurantsListModelTests: XCTestCase {
         })
         
         XCTAssert(model.list.isEmpty)
+        XCTAssert(model.state == .empty)
+
+        wait(for: [expectation], timeout: 0.5)
+    }
+    
+    func test_fetchRestaurantsFailed() throws {
+        repository.kindOfResponse = .error
+        
+        let expectation = XCTestExpectation(description: "fetch restaurants from model")
+        
+        model.fetchRestaurants(state: "NY", page: 1)
+        
+        _ = model.$list.sink(receiveValue: { value in
+            expectation.fulfill()
+        })
+        
+        XCTAssert(model.list.isEmpty)
+        XCTAssert(model.state == .error)
 
         wait(for: [expectation], timeout: 0.5)
     }

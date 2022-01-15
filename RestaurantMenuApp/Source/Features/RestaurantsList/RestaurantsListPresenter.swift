@@ -14,12 +14,11 @@ class RestaurantsListPresenter: ObservableObject {
     private let interactor: RestaurantsListInteractor
     
     private var cancellables = Set<AnyCancellable>()
+    private var currentPage = 1
+    private var selectedState = "NY"
     
     @Published var list: [Restaurant] = []
-    
-    private var currentPage = 1
-    
-    private var selectedState = "NY"
+    @Published var state: RestaurantListState = .loading
     
     init(interactor: RestaurantsListInteractor) {
         self.interactor = interactor
@@ -29,15 +28,20 @@ class RestaurantsListPresenter: ObservableObject {
             .assign(to: \.list, on: self)
             .store(in: &cancellables)
         
-        // TODO: Handle pagination
-        
+        interactor.model.$state
+            .receive(on: DispatchQueue.main)
+            .assign(to: \.state, on: self)
+            .store(in: &cancellables)
+    }
+    
+    func load() {
         interactor.fetchRestaurants(state: selectedState, page: currentPage)
     }
     
     func restaurantLinkBuilder<Content: View>(for restaurant: Restaurant, @ViewBuilder content: () -> Content) -> some View {
-        
         NavigationLink(destination: router.makeDetailView(for: restaurant)) {
             content()
         }
+        .buttonStyle(.plain)
     }
 }

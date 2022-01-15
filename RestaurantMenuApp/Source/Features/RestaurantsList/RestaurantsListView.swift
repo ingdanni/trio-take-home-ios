@@ -15,13 +15,17 @@ struct RestaurantsListView: View {
         NavigationView {
             ScrollView {
                 LazyVStack {
-                    ForEach(presenter.list, id: \.restaurantID) { item in
-                        
-                        self.presenter.restaurantLinkBuilder(for: item, content: {
-                            RestaurantItemView(
-                                title: item.restaurantName,
-                                subtitle: item.cuisinesString)
-                        })
+                    switch presenter.state {
+                    case .loading:
+                        ProgressView("Loading restaurants")
+                            .id("progressView")
+                    case .loaded:
+                        restaurantsList
+                            .id("restaurantList")
+                    case .empty:
+                        MessageView(content: "No restaurants found, try again later.")
+                    case .error:
+                        MessageView(content: "An error ocurred, try again later.")
                     }
                 }
             }
@@ -33,6 +37,22 @@ struct RestaurantsListView: View {
                             .font(.montserratRegular(size: 20))
                     }
                 }
+            }
+            .onAppear {
+                presenter.load()
+            }
+        }
+    }
+    
+    var restaurantsList: some View {
+        Group {
+            ForEach(presenter.list, id: \.restaurantID) { item in
+                
+                self.presenter.restaurantLinkBuilder(for: item, content: {
+                    RestaurantItemView(
+                        title: item.restaurantName,
+                        subtitle: item.cuisinesString)
+                })
             }
         }
     }
@@ -71,17 +91,10 @@ struct RestaurantsListView_Previews: PreviewProvider {
     static var previews: some View {
         NavigationView {
             ScrollView {
-                ForEach(0..<10) { _ in
-                    RestaurantItemView(title: "Monalisa pasta & pizza", subtitle: "Italian, pizza, pasta")
-                }
-            }
-            .navigationBarTitleDisplayMode(.large)
-            .toolbar {
-                ToolbarItem(placement: .principal) {
-                    VStack(alignment: .leading) {
-                        Text("Restaurants in NY")
-                            .font(.montserratRegular(size: 20))
-                    }
+                ForEach(0..<5) { _ in
+                    RestaurantItemView(
+                        title: "Monalisa pasta & pizza",
+                        subtitle: "Italian, pizza, pasta")
                 }
             }
         }

@@ -7,17 +7,20 @@
 
 import XCTest
 import ViewInspector
+import SwiftUI
+import Combine
 
 @testable import RestaurantMenuApp
 
 class RestaurantsListViewTests: XCTestCase {
     
+    var repository: MockRestaurantRepository!
     var view: RestaurantsListView!
     var model: RestaurantsListModel!
 
     override func setUpWithError() throws {
-        model = RestaurantsListModel(repository: MockRestaurantRepository())
-        
+        repository = MockRestaurantRepository()
+        model = RestaurantsListModel(repository: repository)
         view = RestaurantsListView(
             presenter: RestaurantsListPresenter(
                 interactor: RestaurantsListInteractor(
@@ -29,9 +32,42 @@ class RestaurantsListViewTests: XCTestCase {
         view = nil
     }
     
+    func test_showProgressView() throws {
+        ViewHosting.host(view: view, size: nil)
+        
+        XCTAssertNoThrow(try view
+                            .inspect()
+                            .find(viewWithId: "progressView"))
+    }
+    
+    func test_restaurantsList() throws {
+        let expectation = XCTestExpectation(
+            description: "fetch restaurants from view")
+        
+        ViewHosting.host(view: view, size: CGSize(width: 100, height: 100))
+        
+        _ = model.$list.assign(to: \.list, on: view.presenter)
+        _ = model.$state.assign(to: \.state, on: view.presenter)
+        _ = view.presenter
+            .$list
+            .sink(receiveValue: { value in
+                guard !value.isEmpty else { return }
+            
+                expectation.fulfill()
+            })
+        
+        XCTAssertNoThrow(try view
+                            .inspect()
+                            .find(viewWithId: "restaurantList"))
+        
+        wait(for: [expectation], timeout: 0.5)
+    }
+    
     func test_fetchRestaurants() throws {
         let expectation = XCTestExpectation(
             description: "fetch restaurants from view")
+        
+        view.presenter.load()
         
         _ = model.$list.sink(receiveValue: { value in
             guard !value.isEmpty else { return }
@@ -41,6 +77,43 @@ class RestaurantsListViewTests: XCTestCase {
         
         XCTAssertFalse(model.list.isEmpty)
         XCTAssert(model.list.count == 22)
+        XCTAssert(model.state == .loaded)
+        
+        wait(for: [expectation], timeout: 0.5)
+    }
+    
+    func test_fetchRestaurantsEmpty() throws {
+        repository.kindOfResponse = .empty
+        
+        let expectation = XCTestExpectation(
+            description: "fetch restaurants from view")
+        
+        view.presenter.load()
+        
+        _ = model.$list.sink(receiveValue: { value in
+            expectation.fulfill()
+        })
+        
+        XCTAssert(model.list.isEmpty)
+        XCTAssert(model.state == .empty)
+        
+        wait(for: [expectation], timeout: 0.5)
+    }
+    
+    func test_fetchRestaurantsFailed() throws {
+        repository.kindOfResponse = .error
+        
+        let expectation = XCTestExpectation(
+            description: "fetch restaurants from view")
+        
+        view.presenter.load()
+        
+        _ = model.$list.sink(receiveValue: { value in
+            expectation.fulfill()
+        })
+        
+        XCTAssert(model.list.isEmpty)
+        XCTAssert(model.state == .error)
         
         wait(for: [expectation], timeout: 0.5)
     }
@@ -67,6 +140,8 @@ class RestaurantsListViewTests: XCTestCase {
         XCTAssert(subtitle == "subtitle")
     }
 }
+
+// MARK: Inspectable conformance
 
 extension RestaurantsListView: Inspectable {}
 

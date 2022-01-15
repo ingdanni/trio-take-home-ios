@@ -7,28 +7,37 @@
 
 import SwiftUI
 
+enum RestaurantMenuState: String {
+    case loading
+    case loaded
+    case empty
+    case error
+}
+
 final class RestaurantMenuModel {
     
     private let repository: RestaurantProvider
     
     @Published var list: [MenuItem] = []
     @Published var categories: [String] = []
+    @Published var state: RestaurantMenuState = .loading
     
     init(repository: RestaurantProvider) {
         self.repository = repository
     }
     
     func fetchMenuItems(restaurantId: Int) {
-        repository.fetchMenuItems(restaurantId: restaurantId) { response in
-            switch response {
-            case let .success(res):
-                self.list = res.data
-                let subsections = res.data.map { $0.subsection }
-                let uniques = Set(subsections)
+        repository.fetchMenuItems(restaurantId: restaurantId) { result in
+            switch result {
+            case let .success(response):
+                let uniques = Set(response.data.map { $0.subsection })
                 self.categories = Array(uniques)
                 
-            case let .failure(error):
-                print(error)
+                self.list = response.data
+                self.state = self.list.isEmpty ? .empty : .loaded
+                
+            case .failure:
+                self.state = .error
             }
         }
     }
