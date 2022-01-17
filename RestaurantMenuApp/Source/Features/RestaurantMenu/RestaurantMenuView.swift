@@ -26,12 +26,16 @@ struct RestaurantMenuView: View {
                     switch presenter.state {
                     case .loading:
                         ProgressView("Loading menu")
+                            .id("loadingView")
                     case .loaded:
                         menuItemsList
+                            .id("menuItemsView")
                     case .empty:
                         MessageView(content: "Sorry, we didn't find menu items")
+                            .id("emptyMessageView")
                     case .error:
                         MessageView(content: "An error ocurred, try again later.")
+                            .id("errorMessageView")
                     }
                 }
             }
@@ -135,6 +139,7 @@ struct MenuCategorySelector: View {
                                 : Color.customLightGray2
                             )
                             .padding(.horizontal, 16)
+                            .id(item)
                             
                             Rectangle()
                                 .fill(

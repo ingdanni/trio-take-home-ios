@@ -28,11 +28,12 @@ class RestaurantsListViewTests: XCTestCase {
     }
 
     override func tearDownWithError() throws {
+        repository = nil
         model = nil
         view = nil
     }
     
-    func test_showProgressView() throws {
+    func test_fetchRestaurantsList_loadingState() throws {
         ViewHosting.host(view: view, size: nil)
         
         XCTAssertNoThrow(try view
@@ -40,11 +41,11 @@ class RestaurantsListViewTests: XCTestCase {
                             .find(viewWithId: "progressView"))
     }
     
-    func test_restaurantsList() throws {
+    func test_fetchRestaurantsList_loadedState() throws {
         let expectation = XCTestExpectation(
             description: "fetch restaurants from view")
         
-        ViewHosting.host(view: view, size: CGSize(width: 100, height: 100))
+        ViewHosting.host(view: view, size: nil)
         
         _ = model.$list.assign(to: \.list, on: view.presenter)
         _ = model.$state.assign(to: \.state, on: view.presenter)
@@ -59,6 +60,52 @@ class RestaurantsListViewTests: XCTestCase {
         XCTAssertNoThrow(try view
                             .inspect()
                             .find(viewWithId: "restaurantList"))
+        
+        wait(for: [expectation], timeout: 0.5)
+    }
+    
+    func test_fetchRestaurantsList_emptyState() throws {
+        repository.kindOfResponse = .empty
+        
+        let expectation = XCTestExpectation(
+            description: "fetch restaurants from view")
+        
+        ViewHosting.host(view: view, size: nil)
+        
+        _ = model.$list.assign(to: \.list, on: view.presenter)
+        _ = model.$state.assign(to: \.state, on: view.presenter)
+        _ = view.presenter
+            .$list
+            .sink(receiveValue: { value in
+                expectation.fulfill()
+            })
+        
+        XCTAssertNoThrow(try view
+                            .inspect()
+                            .find(viewWithId: "emptyMessage"))
+        
+        wait(for: [expectation], timeout: 0.5)
+    }
+    
+    func test_fetchRestaurantsList_errorState() throws {
+        repository.kindOfResponse = .error
+        
+        let expectation = XCTestExpectation(
+            description: "fetch restaurants from view")
+        
+        ViewHosting.host(view: view, size: nil)
+        
+        _ = model.$list.assign(to: \.list, on: view.presenter)
+        _ = model.$state.assign(to: \.state, on: view.presenter)
+        _ = view.presenter
+            .$list
+            .sink(receiveValue: { value in
+                expectation.fulfill()
+            })
+        
+        XCTAssertNoThrow(try view
+                            .inspect()
+                            .find(viewWithId: "errorMessage"))
         
         wait(for: [expectation], timeout: 0.5)
     }

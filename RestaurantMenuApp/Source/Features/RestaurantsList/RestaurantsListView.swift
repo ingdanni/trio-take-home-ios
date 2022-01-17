@@ -24,8 +24,10 @@ struct RestaurantsListView: View {
                             .id("restaurantList")
                     case .empty:
                         MessageView(content: "No restaurants found, try again later.")
+                            .id("emptyMessage")
                     case .error:
                         MessageView(content: "An error ocurred, try again later.")
+                            .id("errorMessage")
                     }
                 }
             }
